@@ -29,7 +29,6 @@ app.get("/airports/search/code", db.findAirportByCode);
 
 app.get("/aircrafts", db.getAircrafts);
 app.get("/aircraft", db.getAircraftById);
-app.get("aircraft/search/type", db.findAircraftByType);
 
 app.get("/passengers", db.getPassengers);
 app.get("/passenger", db.getPassengerById);
