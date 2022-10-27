@@ -17,21 +17,27 @@ app.get('/', (request, response) => {
 
 app.get('/cities', db.getCities)
 app.get('/city', db.getCityById)
-app.get('/cities/search', db.findCitiesByName)
+app.get('/cities/search', db.findCityByName)
 app.post('/city/create', db.createCity)
 app.put('/city/:id', db.updateCity)
 app.delete('/city/:id', db.deleteCity)
 
 app.get('/airports', db.getAirports)
 app.get('/airport', db.getAirportById)
-app.get('/airports/search/name', db.findAirportsByName)
-app.get('/airports/search/code', db.findAirportsByCode)
+app.get('/airports/search/name', db.findAirportByName)
+app.get('/airports/search/code', db.findAirportByCode)
 
 app.get('/aircrafts', db.getAircrafts)
 app.get('/aircraft', db.getAircraftById)
+app.get('aircraft/search/type', db.findAircraftByType)
 
 app.get('/passengers', db.getPassengers)
 app.get('/passenger', db.getPassengerById)
+app.get('/passenger/search/lastname', db.getPassengerByLastName)
+
+app.post('/create/airlines', db.createAirlinesTable)
+app.post('/create/airline', db.createAirline)
+app.get('/airlines', db.getAirlines)
 
 //4 Questions
 app.get('/airportscities', db.getAirportsCities)
@@ -44,6 +50,3 @@ app.listen(port, () => {
 })
 
 
-
-// DT was here
-// Hello Kara

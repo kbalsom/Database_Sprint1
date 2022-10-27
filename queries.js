@@ -30,7 +30,7 @@ const getCityById = (request, response) => {
   })
 }
 
-const findCitiesByName = (request, response) => {
+const findCityByName = (request, response) => {
   const id = parseInt(request.query.id)
   const name = request.query.city_name
 
@@ -116,7 +116,7 @@ const getAirportById = (request, response) => {
   })
 }
 
-const findAirportsByName = (request, response) => {
+const findAirportByName = (request, response) => {
   const id = parseInt(request.query.id)
   const name = request.query.airport_name
 
@@ -143,7 +143,7 @@ const findAirportsByName = (request, response) => {
 
 }
 
-const findAirportsByCode = (request, response) => {
+const findAirportByCode = (request, response) => {
   const id = parseInt(request.query.id)
   const code = request.query.code
 
@@ -192,15 +192,15 @@ const getAircraftById = (request, response) => {
   })
 }
 
-const findAircraftsByName = (request, response) => {
+const findAircraftByType = (request, response) => {
   const id = parseInt(request.query.id)
-  const name = request.query.name
+  const type = request.query.type
 
   var sqlStmt = 'SELECT * FROM qap1.aircrafts where '
 
-  if (!name == false) {
-    sqlStmt += ("name = '" + name + "' ")
-    console.log("adding name = " + name)
+  if (!type == false) {
+    sqlStmt += ("type = '" + type + "' ")
+    console.log("adding type = " + type)
   }
 
   if (!Number.isNaN(id)) {
@@ -240,11 +240,37 @@ const getPassengerById = (request, response) => {
   })
 }
 
+const getPassengerByLastName = (request, response) => {
+  const id = parseInt(request.query.id)
+  const name = request.query.last_name
+
+  var sqlStmt = 'SELECT * FROM qap1.aircrafts where '
+
+  if (!name == false) {
+    sqlStmt += ("last_name = '" + name + "' ")
+    console.log("adding last_name = " + name)
+  }
+
+  if (!Number.isNaN(id)) {
+    sqlStmt += ("AND id = " + id)
+    console.log("Id = " + id)
+  }
+
+  console.log(sqlStmt)
+
+  pool.query(sqlStmt, (error, results) => {
+    if (error) {
+      throw error
+    }
+    response.status(200).json(results.rows)
+  })
+}
+
 //WHAT AIRCRAFTS CAN LAND IN WHAT AIRPORTS: FIX THIS!!!!
 const getAirportsCities = (request, response) => {
   pool.query(`SELECT a."airport_name", c."city_name"
   FROM qap1.airports a
-  INNER JOIN qap1.cities c ON a."cities_id"= c.id;
+  INNER JOIN qap1.cities c ON a."city_id"= c.id;
   `, (error, results) => {
     if (error) {
       throw error
@@ -255,10 +281,10 @@ const getAirportsCities = (request, response) => {
 
 //WHAT AIRCRAFTS CAN LAND IN WHAT AIRPORTS:
 const getAircraftsAirports = (request, response) => {
-  pool.query(`select c."type", c."airlineName", p."airport_name"
+  pool.query(`select c."type", c."airline_name", p."airport_name"
   from qap1.aircrafts_airports a
-  inner join qap1.aircrafts c on a."aircrafts_id"=c.id
-  inner join qap1.airports p on a."airports_id"=p.id;
+  inner join qap1.aircrafts c on a."aircraft_id"=c.id
+  inner join qap1.airports p on a."airport_id"=p.id;
   `, (error, results) => {
     if (error) {
       throw error
@@ -270,10 +296,10 @@ const getAircraftsAirports = (request, response) => {
 
 //WHAT PASSENGERS ON WHICH AIRCRAFTS:
 const getPassengersAircrafts = (request, response) => {
-  pool.query(`SELECT p."firstName", p."lastName" , c."type"
+  pool.query(`SELECT p."first_name", p."last_name" , c."type"
   from qap1.passengers_aircrafts a
-  inner join qap1.passengers p on a."passengers_id" = p.id
-  inner join qap1.aircrafts c on a."aircrafts_id" = c.id;`, (error, results) => {
+  inner join qap1.passengers p on a."passenger_id" = p.id
+  inner join qap1.aircrafts c on a."aircraft_id" = c.id;`, (error, results) => {
     if (error) {
       throw error
     }
@@ -297,28 +323,62 @@ const getPassengersAirports = (request, response) => {
   })
 }
 
-//PUT
-//POST
-//DELETE
+
+//CREATE A NEW TABLE:
+
+const createAirlinesTable = (request, response) => {
+  var sql = "CREATE TABLE qap1.airlines (id INT, airline_name VARCHAR(255), country VARCHAR(255))";
+  pool.query(sql, function (err, result) {
+    if (err) throw err;
+  })
+  response.status(200).json(`Table Created`)
+}
+
+const createAirline = (request, response) => {
+  const { id, airline_name, country } = request.body
+
+  pool.query('INSERT INTO qap1.airlines (id, airline_name, country) VALUES ($1, $2, $3)', [id, airline_name, country], (error, results) => {
+    if (error) {
+      throw error
+    }
+    response.status(201).send(`Airline added with ID: ${id}`)
+  })
+}
+
+const getAirlines = (request, response) => {
+  pool.query('SELECT * FROM qap1.airlines ORDER BY id ASC', (error, results) => {
+    if (error) {
+      throw error
+    }
+    response.status(200).json(results.rows)
+  })
+}
+
+
+
 
 module.exports = {
   getCities,
   getCityById,
-  findCitiesByName,
+  findCityByName,
   createCity,
   updateCity,
   deleteCity,
   getAirports,
   getAirportById,
-  findAirportsByCode,
-  findAirportsByName,
+  findAirportByCode,
+  findAirportByName,
   getAircrafts,
   getAircraftById,
-  findAircraftsByName,
+  findAircraftByType,
   getPassengers,
   getPassengerById,
+  getPassengerByLastName,
+  createAirlinesTable,
+  createAirline,
+  getAirlines,
   getAirportsCities,
   getAircraftsAirports,
   getPassengersAircrafts,
-  getPassengersAirports
+  getPassengersAirports,
 }
