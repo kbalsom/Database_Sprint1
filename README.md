@@ -5,3 +5,5 @@ Semester Three Database Programming Sprint One
 - Glen May
 - Makenzie Roberts
 - David Turner
+
+![Database ERD](ERD.png)
